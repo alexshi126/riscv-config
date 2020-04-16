@@ -207,6 +207,7 @@ misa:
       default: 0
       check_with:
       - max_length
+      - misa_reset_check
     rv32:
       type: dict
       schema:
@@ -245,12 +246,8 @@ misa:
                     type: list
                     schema:
                       type: integer
-                      max: 4611686018427387903
+                      allowed: [1,2,3] 
                     maxlength: 1
-              -
-                schema:
-                  ro_variable:
-                    type: boolean
               -
                 schema:
                   warl: *id001
@@ -346,12 +343,8 @@ misa:
                     type: list
                     schema:
                       type: integer
-                      max: 4611686018427387903
+                      allowed: [1,2,3]
                     maxlength: 1
-              -
-                schema:
-                  ro_variable:
-                    type: boolean
               -
                 schema:
                   warl: *id001

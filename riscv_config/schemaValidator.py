@@ -60,13 +60,10 @@ class schemaValidator(Validator):
         global extensions
         extension_enc = list("00000000000000000000000000")
         if "32" in value:
-            xlen = 32
             ext = value[4:]
         elif "64" in value:
-            xlen = 64
             ext = value[4:]
         elif "128" in value:
-            xlen = 128
             ext = value[5:]
         else:
             self._error(field, "Invalid width in ISA.")
@@ -95,6 +92,31 @@ class schemaValidator(Validator):
                 extension_enc[25 - int(ord(x) - ord('A'))] = "1"
         extensions = int("".join(extension_enc), 2)
         extensions = int("".join(extension_enc), 2)
+
+    def _check_with_misa_reset_check(self, field, value):
+        global xlen
+        global extensions
+        if value != 0:
+            bin_str = bin(value)[2:].zfill(max(xlen))
+            mxl = int(bin_str[0:2], base=2)
+            if mxl != max(xlen) / 32:
+                self._error(
+                    field,
+                    "Reset value of mxl does not match the highest possible xlen supported."
+                )
+            extension_val = int(bin_str[-26:], base=2)
+            if extensions & 256:
+                if extension_val != (extensions & ~16):
+                    self._error(
+                        field,
+                        "Invalid extension reset value. Hint: The value should be equal to the maximum supported extensions except the E extension in the event that both I and E are present."
+                    )
+            else:
+                if extension_val != extensions:
+                    self._error(
+                        field,
+                        "Invalid extension reset value. Hint: The value should be equal to the maximum supported extensions except the E extension in the event that both I and E are present."
+                    )
 
     def _check_with_rv32_check(self, field, value):
         global xlen
